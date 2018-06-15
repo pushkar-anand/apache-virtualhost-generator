@@ -1,0 +1,81 @@
+#!/usr/bin/php
+<?php
+
+$apache_sites_dir = "/etc/apache2/sites-available";
+$apache_web_dir = "/var/www";
+$hosts_file = "/etc/hosts";
+$local_ip = "127.0.1.1";
+
+if (is_writable($apache_sites_dir) && is_writable($apache_sites_dir) && is_writable($hosts_file)) {
+    $domain = readline("Enter domain of the virtual host: ");
+    $local = readline("Local (will add to hosts file)(y/n): ");
+
+    $conf_filename = "$domain.conf";
+    $document_root = "$apache_web_dir/$domain/html";
+
+    echo "\nCreating VirtualHost $domain.....\n......\n";
+    $conf =
+        <<<CONF
+<VirtualHost *:80>
+	ServerName $domain
+
+	ServerAdmin webmaster@$domain
+	DocumentRoot $document_root
+
+	ErrorLog \${APACHE_LOG_DIR}/$domain.error.log
+	CustomLog \${APACHE_LOG_DIR}/$domain.access.log combined
+</VirtualHost>
+CONF;
+
+    if ($local == 'y') {
+        $write = fopen($hosts_file, 'a');
+
+        $host_content =
+            <<<HOST
+
+#added by virtual.php
+$local_ip $domain
+
+HOST;
+
+        fwrite($write, $host_content);
+        fclose($write);
+    } else {
+
+        $configure_www = readline("\nDo you want to setup www redirect to non-www(y/n)");
+        if ($configure_www == "y") {
+            echo "\nRedirecting www to non-www.....\n";
+            echo "Remember to add a CNAME in dns records for www.$domain to $domain\n";
+
+            $conf .=
+                <<<CONF
+<VirtualHost *:80>
+	ServerName www.$domain
+	Redirect permanent / http://$domain
+</VirtualHost>
+CONF;
+        }
+    }
+
+    $conf_path = "$apache_sites_dir/$conf_filename";
+
+    $write = fopen($conf_path, "w");
+    fwrite($write, $conf);
+    fclose($write);
+
+    if (!mkdir($document_root, 0755, true)) {
+        echo "The document root: $document_root was not created. Create it yourself.\n";
+    } else {
+        $write = fopen($document_root . "/index.html", "w");
+        fwrite($write, "VirtualHost $domain is working!!");
+        fclose($write);
+    }
+
+    echo "\n.........................\n.........................\n.........................";
+    echo "\nVirtualHost $domain is ready. Run a2ensite $domain to enable.\n";
+    echo "Test virtual host by visiting $domain/ in your browser after enabling.\n";
+
+} else {
+    echo "This script does not enough permissions. Run it as sudo\n";
+}
+
