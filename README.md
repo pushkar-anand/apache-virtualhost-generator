@@ -12,3 +12,6 @@ $ chmod +x gen-virtual
 $ ./gen-virtual
 ```
 **Make sure have php installed in your machine.**
+
+To add the script for global access run 
+```$ sudo ln -s /path/to/apache-virtualhost-generator/gen-virtual /usr/bin/gen-virtual ```
