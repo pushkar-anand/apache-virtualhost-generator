@@ -11,7 +11,7 @@ if (is_writable($apache_sites_dir) && is_writable($apache_sites_dir) && is_writa
     $local = readline("Local (will add to hosts file)(y/n): ");
 
     $conf_filename = "$domain.conf";
-    $document_root = "$apache_web_dir/$domain/html";
+    $document_root = "$apache_web_dir/$domain/public";
 
     echo "\nCreating VirtualHost $domain.....\n......\n";
     $conf =
