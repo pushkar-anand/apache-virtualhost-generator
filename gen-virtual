@@ -16,6 +16,7 @@ if (is_writable($apache_sites_dir) && is_writable($apache_sites_dir) && is_writa
     echo "\nCreating VirtualHost $domain.....\n......\n";
     $conf =
         <<<CONF
+	
 <VirtualHost *:80>
 	ServerName $domain
 
@@ -25,6 +26,7 @@ if (is_writable($apache_sites_dir) && is_writable($apache_sites_dir) && is_writa
 	ErrorLog \${APACHE_LOG_DIR}/$domain.error.log
 	CustomLog \${APACHE_LOG_DIR}/$domain.access.log combined
 </VirtualHost>
+
 CONF;
 
     if ($local == 'y') {
@@ -49,6 +51,7 @@ HOST;
 
             $conf .=
                 <<<CONF
+		
 <VirtualHost *:80>
 	ServerName www.$domain
 	Redirect permanent / http://$domain
