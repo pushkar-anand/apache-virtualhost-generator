@@ -6,7 +6,10 @@ $apache_web_dir = "/var/www";
 $hosts_file = "/etc/hosts";
 $local_ip = "127.0.1.1";
 
-if (is_writable($apache_sites_dir) && is_writable($apache_sites_dir) && is_writable($hosts_file)) {
+if (!is_writable($apache_sites_dir) || !is_writable($apache_sites_dir) || !is_writable($hosts_file)) {
+	    echo "This script does not enough permissions. Run it as sudo\n";
+} else {
+	
     $domain = readline("Enter domain of the virtual host: ");
     $local = readline("Local (will add to hosts file)(y/n): ");
 
@@ -78,7 +81,5 @@ CONF;
     echo "\nVirtualHost $domain is ready. Run a2ensite $domain to enable.\n";
     echo "Test virtual host by visiting $domain/ in your browser after enabling.\n";
 
-} else {
-    echo "This script does not enough permissions. Run it as sudo\n";
 }
 
