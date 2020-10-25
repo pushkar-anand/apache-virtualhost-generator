@@ -1,25 +1,23 @@
 #!/usr/bin/php
 <?php
 
-$apache_sites_dir = "/etc/apache2/sites-available";
-$apache_web_dir = "/var/www";
-$hosts_file = "/etc/hosts";
-$local_ip = "127.0.1.1";
+const APACHE_SITES_DIR = "/etc/apache2/sites-available";
+const APACHE_WEB_DIR = "/var/www";
+const HOSTS_FILE = "/etc/hosts";
+const LOCAL_IP = "127.0.1.1";
 
-if (!is_writable($apache_sites_dir) || !is_writable($apache_sites_dir) || !is_writable($hosts_file)) {
-	    echo "This script does not enough permissions. Run it as sudo\n";
+if (!is_writable(APACHE_SITES_DIR) || !is_writable(APACHE_WEB_DIR) || !is_writable(HOSTS_FILE)) {
+    echo "This script does not enough permissions. Run it as sudo\n";
 } else {
-	
     $domain = readline("Enter domain of the virtual host: ");
     $local = readline("Local (will add to hosts file)(y/n): ");
 
     $conf_filename = "$domain.conf";
-    $document_root = "$apache_web_dir/$domain/public";
+    $document_root = APACHE_WEB_DIR . '/$domain/public';
 
     echo "\nCreating VirtualHost $domain.....\n......\n";
     $conf =
         <<<CONF
-	
 <VirtualHost *:80>
 	ServerName $domain
 
@@ -33,13 +31,13 @@ if (!is_writable($apache_sites_dir) || !is_writable($apache_sites_dir) || !is_wr
 CONF;
 
     if ($local == 'y') {
-        $write = fopen($hosts_file, 'a');
+        $ip = LOCAL_IP;
+        $write = fopen(HOSTS_FILE, 'a');
 
         $host_content =
             <<<HOST
-
 #added by virtual.php
-$local_ip $domain
+$ip $domain
 
 HOST;
 
@@ -63,7 +61,7 @@ CONF;
         }
     }
 
-    $conf_path = "$apache_sites_dir/$conf_filename";
+    $conf_path = APACHE_SITES_DIR . "/$conf_filename";
 
     $write = fopen($conf_path, "w");
     fwrite($write, $conf);
